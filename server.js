@@ -23,9 +23,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'timssupersecretkey'
 }));
 app.use((req, res, next) => {
-  if (req.session.email) {
-    app.locals.email = req.session.email
-  }
+  app.locals.email = req.user && req.user.email
   next()
 });
 
