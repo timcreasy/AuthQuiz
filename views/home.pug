@@ -2,7 +2,11 @@ if email
   h1 Welcome #{email}
 else
 ul
-  li
-    a(href="/login") Login
-  li
-    a(href="/register") Register
+  if email
+    li
+      a(href="/logout") Logout
+  else
+    li
+      a(href="/login") Login
+    li
+      a(href="/register") Register

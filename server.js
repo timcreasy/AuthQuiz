@@ -27,6 +27,8 @@ app.use(session({
 app.use((req, res, next) => {
   if (req.session.email) {
     app.locals.email = req.session.email
+  } else {
+    app.locals.email = null;
   }
   next()
 });
@@ -80,6 +82,13 @@ app.post('/login', (req, res) => {
       req.session.email = req.body.email;
       res.redirect('/');
     }
+  })
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) { throw err }
+    res.redirect('/login');
   })
 });
 

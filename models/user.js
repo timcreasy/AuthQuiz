@@ -32,3 +32,7 @@ userSchema.pre('save', function(done) {
 
 
 module.exports = User;
+
+function sayHello(name) {
+
+}
