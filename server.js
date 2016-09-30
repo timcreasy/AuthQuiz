@@ -4,15 +4,23 @@ const connectDatabase = require('./db/database');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const RedisStore = require('connect-redis')(session);
 const User = require('./models/user');
 
 // Config
+const PORT = process.env.PORT || 8080;
+app.set('port', PORT);
 app.set('view engine', 'pug');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
-  secret: 'timssupersecretkey'
+  store: new RedisStore({
+    url: process.env.REDIS_URL || 'redis://localhost:6379'
+  }),
+  resave: false,
+  saveUninitialized: false,
+  secret: process.env.SESSION_SECRET || 'timssupersecretkey'
 }));
 app.use((req, res, next) => {
   if (req.session.email) {
@@ -81,8 +89,8 @@ app.use((err, req, res, next) => {
 
 connectDatabase
   .then(() => {
-    app.listen(8080, () => {
-      console.log("Server listening on port 8080...");
+    app.listen(PORT, () => {
+      console.log(`Server listening on port ${PORT}...`);
     })
   })
   .catch((err) => {
