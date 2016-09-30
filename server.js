@@ -35,7 +35,31 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  console.log(req.body);
+    User
+    .findOne({email: req.body.email})
+    .then((user) => {
+      if (!user) {
+        res.redirect('/login');
+      } else {
+        return new Promise((resolve, reject) => {
+          bcrypt.compare(req.body.password, user.password, (err, matches) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(matches)
+            }
+          });
+        });
+      }
+    })
+    .then((matches) => {
+      if (!matches) {
+        res.redirect('/login');
+      } else {
+        req.session.email = req.body.email;
+        res.redirect('/');
+      }
+    })
 });
 
 // Error handler
