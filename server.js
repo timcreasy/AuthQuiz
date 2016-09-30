@@ -10,7 +10,25 @@ app.set('view engine', 'pug');
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
-app.use(routes);
+app.get('/', (req, res) => {
+  res.render('home');
+});
+
+app.get('/register', (req, res) => {
+  res.render('register');
+});
+
+app.post('/register', (req, res) => {
+  console.log(req.body);
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.post('/login', (req, res) => {
+  console.log(req.body);
+});
 
 // Error handler
 app.use((err, req, res, next) => {
