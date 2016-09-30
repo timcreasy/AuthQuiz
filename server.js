@@ -12,6 +12,8 @@ const PORT = process.env.PORT || 8080;
 app.set('port', PORT);
 app.set('view engine', 'pug');
 
+app.locals.email = "";
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
@@ -23,7 +25,9 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'timssupersecretkey'
 }));
 app.use((req, res, next) => {
-  app.locals.email = req.user && req.user.email
+  if (req.session.email) {
+    app.locals.email = req.session.email
+  }
   next()
 });
 
