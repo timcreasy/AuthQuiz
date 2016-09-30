@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const connectDatabase = require('./db/database');
 const bodyParser = require('body-parser');
+const User = require('./models/user');
 
 // Config
 app.set('view engine', 'pug');
@@ -19,7 +20,14 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  console.log(req.body);
+  User
+    .create({email: req.body.email, password: req.body.password})
+    .then((user) => {
+      res.redirect('/login');
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 app.get('/login', (req, res) => {
