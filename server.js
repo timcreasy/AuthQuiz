@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const connectDatabase = require('./db/database');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
 const User = require('./models/user');
 
 // Config
@@ -9,6 +11,15 @@ app.set('view engine', 'pug');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(session({
+  secret: 'timssupersecretkey'
+}));
+app.use((req, res, next) => {
+  if (req.session.email) {
+    app.locals.email = req.session.email
+  }
+  next()
+});
 
 // Routes
 app.get('/', (req, res) => {
@@ -35,31 +46,31 @@ app.get('/login', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-    User
-    .findOne({email: req.body.email})
-    .then((user) => {
-      if (!user) {
-        res.redirect('/login');
-      } else {
-        return new Promise((resolve, reject) => {
-          bcrypt.compare(req.body.password, user.password, (err, matches) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(matches)
-            }
-          });
-        });
-      }
-    })
-    .then((matches) => {
-      if (!matches) {
-        res.redirect('/login');
-      } else {
-        req.session.email = req.body.email;
-        res.redirect('/');
-      }
-    })
+  User
+  .findOne({email: req.body.email})
+  .then((user) => {
+    if (!user) {
+      res.redirect('/login');
+    } else {
+      return new Promise((resolve, reject) => {
+        bcrypt.compare(req.body.password, user.password, (err, matches) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(matches)
+          }
+        })
+      })
+    }
+  })
+  .then((matches) => {
+    if (!matches) {
+      res.redirect('/login');
+    } else {
+      req.session.email = req.body.email;
+      res.redirect('/');
+    }
+  })
 });
 
 // Error handler
